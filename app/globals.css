@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+/* Configuration do Tema para Tailwind v4 */
+@theme {
+  --color-okukala-primary: #03113E;       /* Azul Marinho Escuro (60% do site) */
+  --color-okukala-blue-deep: #01217B;     /* Azul de Transição/Gradiente */
+  --color-okukala-electric: #0A43D8;      /* Azul Elétrico / Hovers */
+  --color-okukala-accent: #FFC800;        /* Dourado Vibrante (CTAs / 10%) */
+  --color-okukala-accent-hover: #FFE066;  /* Dourado Claro para Hover */
+  --color-okukala-border-gold: #E2B000;   /* Borda Dourada Brilhante */
+  --color-okukala-danger: #E52E2E;        /* Vermelho Alerta / Pins */
+
+  --color-text-main: #03113E;
+  --color-text-muted: #64748B;
+  --color-bg-page: #FFFFFF;
+  --color-bg-alt: #F8FAFC;
+  --color-border-main: #E2E8F0;
+  --font-montserrat: var(--font-montserrat);
+  --font-poppins: var(--font-poppins);
+  --font-roboto: var(--font-roboto);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-main);
+    font-family: var(--font-poppins), sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-montserrat), sans-serif;
+    color: var(--color-text-main);
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  /* Botão Principal de Conversão (Dourado com Texto Escuro - Padrão Panfleto) */
+  .btn-primary {
+    @apply bg-[var(--color-okukala-accent)] text-[var(--color-okukala-primary)] font-extrabold py-3.5 px-8 rounded-lg uppercase tracking-wider shadow-lg hover:bg-[var(--color-okukala-accent-hover)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer text-center inline-flex items-center justify-center;
+  }
+
+  /* Botão Secundário (Azul Marinho / Glass) */
+  .btn-secondary {
+    @apply bg-[var(--color-okukala-primary)] text-white font-semibold py-3.5 px-8 rounded-full border border-[var(--color-okukala-electric)] hover:bg-[var(--color-okukala-electric)] transition-all duration-200 cursor-pointer text-center inline-flex items-center justify-center;
+  }
+
+  /* Títulos de Seção */
+  .section-title {
+    @apply text-3xl md:text-4xl font-extrabold text-[var(--color-okukala-primary)] mb-4 tracking-tight;
+  }
+
+  /* Container de Gradiente do Panfleto */
+  .bg-okukala-gradient {
+    background: linear-gradient(135deg, #01217B 0%, #03113E 50%, #0A43D8 100%);
+  }
+
+  /* Card Escuro Estilo Panfleto com Borda Dourada */
+  .okukala-dark-card {
+    @apply bg-[#03113E]/90 border border-[var(--color-okukala-border-gold)]/40 rounded-2xl p-6 text-white shadow-2xl backdrop-blur-md;
+  }
+}
+
+/* Animações Premium Adicionais */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
