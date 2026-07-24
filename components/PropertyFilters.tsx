@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useDebounce } from '@/hooks/useDebounce'
+import { CustomSelect } from '@/components/CustomSelect'
 
 interface PropertyFiltersProps {
   tipoOferta: string
@@ -18,19 +19,7 @@ interface PropertyFiltersProps {
 
 const labelClass = "mb-2 block text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400"
 
-const selectClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 pr-11 text-sm font-medium text-[#03113E] transition-all duration-200 hover:border-[#0A43D8]/40 hover:shadow-sm focus:border-[#0A43D8] focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-[#0A43D8]/10 appearance-none cursor-pointer"
-
 const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-[#03113E] transition-all duration-200 placeholder:text-gray-400 hover:border-[#0A43D8]/40 hover:shadow-sm focus:border-[#0A43D8] focus:bg-white focus:outline-none focus:ring-[3px] focus:ring-[#0A43D8]/10"
-
-function SelectArrow() {
-  return (
-    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5">
-      <svg className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-      </svg>
-    </div>
-  )
-}
 
 export function PropertyFilters({
   tipoOferta,
@@ -79,59 +68,59 @@ export function PropertyFilters({
           {/* Tipo de Oferta */}
           <div>
             <label className={labelClass}>Tipo de Oferta</label>
-            <div className="relative">
-              <select value={tipoOferta} onChange={(e) => onChange('tipoOferta', e.target.value)} className={selectClass}>
-                <option value="">Todos</option>
-                <option value="venda">Venda</option>
-                <option value="aluguel">Aluguel</option>
-              </select>
-              <SelectArrow />
-            </div>
+            <CustomSelect
+              value={tipoOferta}
+              onChange={(v) => onChange('tipoOferta', v)}
+              options={[
+                { value: '', label: 'Todos' },
+                { value: 'venda', label: 'Venda' },
+                { value: 'aluguel', label: 'Aluguel' },
+              ]}
+            />
           </div>
 
           {/* Cidade */}
           <div className="pt-1 border-t border-gray-100">
             <label className={labelClass}>Cidade</label>
-            <div className="relative">
-              <select value={cidade} onChange={(e) => onChange('cidade', e.target.value)} className={selectClass}>
-                <option value="">Todas</option>
-                {cities.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <SelectArrow />
-            </div>
+            <CustomSelect
+              value={cidade}
+              onChange={(v) => onChange('cidade', v)}
+              options={[
+                { value: '', label: 'Todas' },
+                ...cities.map((c) => ({ value: c, label: c })),
+              ]}
+            />
           </div>
 
           {/* Tipologia */}
           <div className="pt-1 border-t border-gray-100">
             <label className={labelClass}>Tipologia</label>
-            <div className="relative">
-              <select value={categoria} onChange={(e) => onChange('categoria', e.target.value)} className={selectClass}>
-                <option value="">Todas</option>
-                <option value="Apartamento">Apartamento</option>
-                <option value="Casa">Casa</option>
-                <option value="Terreno">Terreno</option>
-                <option value="Comercial">Comercial</option>
-                <option value="Quinta">Quinta</option>
-              </select>
-              <SelectArrow />
-            </div>
+            <CustomSelect
+              value={categoria}
+              onChange={(v) => onChange('categoria', v)}
+              options={[
+                { value: '', label: 'Todas' },
+                { value: 'Apartamento', label: 'Apartamento' },
+                { value: 'Casa', label: 'Casa' },
+                { value: 'Terreno', label: 'Terreno' },
+                { value: 'Comercial', label: 'Comercial' },
+                { value: 'Quinta', label: 'Quinta' },
+              ]}
+            />
           </div>
 
           {/* Nº de Quartos */}
           <div className="pt-1 border-t border-gray-100">
             <label className={labelClass}>Nº de Quartos (mín.)</label>
-            <div className="relative">
-              <select value={quartos} onChange={(e) => onChange('quartos', e.target.value)} className={selectClass}>
-                <option value="">Qualquer</option>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>{n}+</option>
-                ))}
-              </select>
-              <SelectArrow />
+            <CustomSelect
+              value={quartos}
+              onChange={(v) => onChange('quartos', v)}
+              options={[
+                { value: '', label: 'Qualquer' },
+                ...Array.from({ length: 5 }, (_, i) => ({ value: String(i + 1), label: `${i + 1}+` })),
+              ]}
+            />
             </div>
-          </div>
 
           {/* Preços */}
           <div className="pt-1 border-t border-gray-100 space-y-4">
