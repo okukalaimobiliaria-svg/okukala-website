@@ -125,7 +125,7 @@ export function PropertyFilters({
           {/* Preços */}
           <div className="pt-1 border-t border-gray-100 space-y-4">
             <div>
-              <label className={labelClass}>Preço Mínimo (AOA)</label>
+              <label className={labelClass}>Preço Mínimo (Kz)</label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -136,7 +136,7 @@ export function PropertyFilters({
               />
             </div>
             <div>
-              <label className={labelClass}>Preço Máximo (AOA)</label>
+              <label className={labelClass}>Preço Máximo (Kz)</label>
               <input
                 type="text"
                 inputMode="numeric"

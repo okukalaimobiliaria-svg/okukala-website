@@ -44,32 +44,42 @@ export default async function ImoveisPage() {
 
   return (
     <main className="w-full">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[#021a5c] py-16 md:py-20">
-        <div className="absolute inset-0">
-          <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[#0A43D8]/20 blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-[#FFC800]/10 blur-3xl" />
+
+      {/* 1. HERO WITH CHEVRON DIVIDER */}
+      <section className="relative h-auto lg:h-[600px] flex flex-col lg:flex-row overflow-hidden">
+        {/* Image (Background) */}
+        <div className="relative lg:absolute right-0 top-0 w-full lg:w-[64%] h-[300px] lg:h-full z-0 overflow-hidden">
+          <img 
+            src="/heros/tierra-mallorca-rgJ1J8SDEAY-unsplash (1).jpg" 
+            alt="Hero Background"
+            className="w-full h-full object-cover object-left" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#021a5c]/90 via-[#021a5c]/50 to-transparent z-10 pointer-events-none" />
         </div>
-        <div className="relative mx-auto max-w-[1400px] px-6 sm:px-8 lg:pl-0 lg:pr-8">
-          <div className="lg:-ml-[max(0px,calc((100vw-1400px)/2))] lg:pl-16 xl:pl-20">
-            <div className="max-w-2xl">
-              <span className="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFC800] backdrop-blur-sm">
-                Catálogo Completo
-              </span>
-              <h1 className="mb-4 text-4xl font-extrabold text-white md:text-5xl">
-                Encontre o Imóvel{' '}
-                <span className="text-[#FFC800]">Perfeito</span>
-              </h1>
-              <p className="text-lg text-blue-200/80">
-                Explore nossa seleção de imóveis premium em Angola. Casas, apartamentos, terrenos e imóveis comerciais.
-              </p>
-            </div>
+
+        {/* Camada 2 (Faixa Amarela Intermediária - z-10) */}
+        <div className="hidden lg:block absolute left-0 top-0 w-full h-full bg-[#FFC800] z-10 lg:[clip-path:polygon(0_0,_52%_0,_39%_50%,_52%_100%,_0_100%)]" />
+
+        {/* Camada 3 (Container Azul Principal - z-20) */}
+        <div className="w-full h-3 bg-[#FFC800] lg:hidden" />
+        <div className="relative w-full bg-[#042A8F] p-8 md:p-12 lg:p-20 z-20 flex items-center lg:[clip-path:polygon(0_0,_49%_0,_36%_50%,_49%_100%,_0_100%)]">
+          <div className="max-w-2xl text-white">
+            <span className="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFC800] backdrop-blur-sm">
+              Catálogo Completo
+            </span>
+            <h1 className="mb-4 text-4xl font-extrabold text-white md:text-5xl">
+              Encontre o Imóvel{' '}
+              <span className="text-[#FFC800]">Perfeito</span>
+            </h1>
+            <p className="text-lg text-blue-200/80 font-light">
+              Explore nossa seleção de imóveis em Angola. Casas, apartamentos, terrenos e imóveis comerciais.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="relative -mt-8 z-10 pb-10">
+      {/* 2. STATS SECTION (Below Hero) */}
+      <section className="py-10 bg-white">
         <div className="mx-auto max-w-[1400px] px-6 sm:px-8 lg:px-12">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {stats.map((stat, index) => (
@@ -77,7 +87,7 @@ export default async function ImoveisPage() {
                 key={index}
                 className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-lg shadow-blue-900/10"
               >
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#0A43D8]">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#021a5c]">
                   <stat.icon size={18} className="text-white" />
                 </div>
                 <div>
@@ -90,9 +100,9 @@ export default async function ImoveisPage() {
         </div>
       </section>
 
-      {/* Content */}
-      <section className="pb-16 md:pb-24">
-        <div className="mx-auto max-w-[1400px] px-6 sm:px-8 lg:pl-0 lg:pr-8">
+      {/* 3. CONTENT */}
+      <section className="pb-16 md:pb-24 overflow-visible">
+        <div className="mx-auto max-w-[1400px] px-6 sm:px-8 lg:pl-0 lg:pr-8 overflow-visible">
           <PropertyList properties={allProperties} />
         </div>
       </section>

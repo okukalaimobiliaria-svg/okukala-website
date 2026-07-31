@@ -178,7 +178,7 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
               className="flex flex-col items-start"
             >
               <span className="text-xs font-bold text-yellow-400 tracking-widest uppercase mb-2 block font-poppins">
-                IMOBILIÁRIA PREMIUM EM ANGOLA
+                IMOBILIÁRIA EM ANGOLA
               </span>
 
               <h1 className="text-4xl lg:text-6xl font-black text-white leading-tight mb-4 font-montserrat">
@@ -189,13 +189,13 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
                 A plataforma imobiliária de referência em Angola. Compre, alugue ou invista com confiança e segurança.
               </p>
 
-              <Link
-                href="/imoveis"
-                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-300 border border-blue-500/30 text-sm md:text-base gap-2 font-poppins"
-              >
-                Buscar Imóvel
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
+                <Link
+                  href="/imoveis"
+                  className="inline-flex items-center justify-center bg-blue-600 hover:bg-[#FFC800] hover:text-[#03113E] text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all duration-300 border border-blue-500/30 text-sm md:text-base gap-2 font-poppins"
+                >
+                  Buscar Imóvel
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
             </motion.div>
           ) : (
             /* Visual B: Dados do Imóvel Ativo na mesma posição */
@@ -256,7 +256,7 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
               {/* Botão Ver Detalhes */}
               <Link
                 href={currentProperty.slug ? `/imoveis/${currentProperty.slug}` : '/imoveis'}
-                className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-blue-600/30 transition-all duration-300 border border-blue-500/30 text-sm md:text-base gap-2 font-poppins"
+                className="inline-flex items-center justify-center bg-blue-600 hover:bg-[#FFC800] hover:text-[#03113E] text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all duration-300 border border-blue-500/30 text-sm md:text-base gap-2 font-poppins"
               >
                 Ver Imóvel
                 <ArrowUpRight className="w-4 h-4" />
@@ -267,45 +267,44 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
       </div>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/* 3. BLOCO DIREITO: INFORMAÇÕES DE AUTORIDADE (STATISTICS)      */}
+      {/* 3. BLOCO DIREITO/BASE: INFORMAÇÕES DE AUTORIDADE (STATISTICS) */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <div className="absolute bottom-16 lg:bottom-24 right-8 lg:right-16 z-20 flex flex-col gap-6 items-end">
-        {/* A. LINHA SUPERIOR — Métricas Institucionais */}
-        <div className="flex items-start gap-8 lg:gap-12">
-          <div>
-            <span className="text-3xl lg:text-4xl font-extrabold text-white">150+</span>
-            <span className="text-xs text-slate-300 block font-medium mt-0.5">Imóveis Listados</span>
-          </div>
-          <div>
-            <span className="text-3xl lg:text-4xl font-extrabold text-white">10+</span>
-            <span className="text-xs text-slate-300 block font-medium mt-0.5">Anos de Experiência</span>
-          </div>
-          <div>
-            <span className="text-3xl lg:text-4xl font-extrabold text-white">98%</span>
-            <span className="text-xs text-slate-300 block font-medium mt-0.5">Clientes Satisfeitos</span>
-          </div>
+      <div className="absolute bottom-8 left-8 right-8 lg:bottom-12 lg:right-16 lg:left-auto z-20 flex flex-col gap-6 lg:items-end">
+        
+        {/* A. LINHA SUPERIOR — Métricas */}
+        <div className="grid grid-cols-3 gap-4 lg:flex lg:items-start lg:gap-12">
+          {[
+            { val: '150+', label: 'Imóveis Listados' },
+            { val: '10+', label: 'Anos de Experiência' },
+            { val: '98%', label: 'Clientes Satisfeitos' },
+          ].map((item, i) => (
+            <div key={i}>
+              <span className="text-2xl lg:text-4xl font-extrabold text-white">{item.val}</span>
+              <span className="text-[10px] lg:text-xs text-slate-300 block font-medium mt-0.5 leading-tight">{item.label}</span>
+            </div>
+          ))}
         </div>
 
-        {/* B. LINHA INFERIOR — Botão Pílula + Bloco de Avaliações */}
-        <div className="flex items-center gap-6">
+        {/* B. LINHA INFERIOR — Botão + Avaliações */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 lg:gap-6 pt-4 border-t border-white/10 lg:border-none">
           <Link
             href="/contato"
-            className="inline-flex items-center justify-center bg-transparent text-white font-semibold px-6 py-3 rounded-xl border border-white/30 hover:bg-white/10 transition-all duration-300 text-sm gap-2 font-poppins"
+            className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent text-white font-semibold px-6 py-3 rounded-xl border border-white/30 hover:bg-[#FFC800] hover:text-[#03113E] transition-all duration-300 text-sm gap-2 font-poppins"
           >
-            Consulta Gratuita
+            Solicitar Consulta
             <ArrowUpRight className="w-4 h-4" />
           </Link>
 
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-white font-bold text-base">4.9</span>
-              <div className="flex gap-0.5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                ))}
+          <div className="text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-1.5">
+                <span className="text-white font-bold text-sm lg:text-base">4.9</span>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-5 h-5 text-[#F5C400] fill-[#F5C400] stroke-[1.5]" />
+                  ))}
+                </div>
               </div>
-            </div>
-            <span className="text-xs text-slate-300 block font-medium mt-1">Avaliação dos Nossos Clientes</span>
+            <span className="text-[10px] lg:text-xs text-slate-300 block font-medium mt-1">Avaliação dos Nossos Clientes</span>
           </div>
         </div>
       </div>

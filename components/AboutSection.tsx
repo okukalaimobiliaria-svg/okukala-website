@@ -11,7 +11,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
               <img
-                src="/Imagens/imovel2.png"
+                src="/Fotografias%20Corporativas/IMG_8978%20-%20okukala%20imobili%C3%A1ria.jpg"
                 alt="Okukala Imobiliária"
                 className="w-full h-[400px] md:h-[500px] object-cover"
               />
@@ -68,7 +68,7 @@ export function AboutSection() {
             <div className="mt-10">
               <Link
                 href="/sobre"
-                className="inline-flex items-center justify-center bg-[#0A43D8] hover:bg-[#042A8F] text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/20 transition-all duration-300 text-sm md:text-base gap-2 font-poppins"
+                className="inline-flex items-center justify-center bg-[#0A43D8] hover:bg-[#FFC800] hover:text-[#03113E] text-white font-semibold px-7 py-2.5 rounded-lg shadow-lg shadow-blue-600/20 transition-all duration-300 text-sm md:text-base gap-2 font-poppins"
               >
                 Conhecer a Nossa História
                 <ArrowRight className="w-4 h-4" />

@@ -1,9 +1,10 @@
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('de-DE', {
-    style: 'currency',
-    currency: 'AOA',
+  const formattedPrice = new Intl.NumberFormat('de-DE', {
     minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(price)
+
+  return `${formattedPrice} Kz`
 }
 
 export function formatDate(date: string): string {

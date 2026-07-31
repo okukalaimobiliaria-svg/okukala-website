@@ -1,15 +1,93 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { Mail, Phone, MapPin, Shield, Users, Star, ArrowRight, CheckCircle, Globe } from 'lucide-react'
+import { useEffect, useRef, useState, Suspense } from 'react'
+import { Mail, Phone, MapPin, Shield, Users, Star, ArrowRight, CheckCircle, Globe, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ContactForm } from '@/components/ContactForm'
 import { MapSection } from '@/components/MapSection'
-import { buttonVariants } from '@/components/ui/button'
+import { sendInvestorInterest, sendWorkApplicationForm } from '@/lib/emailjs'
+
+interface JobItem {
+  title: string
+  location: string
+  description: string
+  requirements: string[]
+  image: string
+}
+
+interface InvestmentItem {
+  title: string
+  description: string
+  image: string
+}
 
 type TabType = 'fale' | 'trabalhe' | 'investidor'
 
 export default function ContatoPage() {
   const [activeTab, setActiveTab] = useState<TabType>('fale')
+  const [activeJobIndex, setActiveJobIndex] = useState(0)
+  const trabalheFormRef = useRef<HTMLFormElement>(null)
+  const [activeInvestmentIndex, setActiveInvestmentIndex] = useState(0)
+  const [jobs, setJobs] = useState<JobItem[]>([])
+  const [investments, setInvestments] = useState<InvestmentItem[]>([])
+  const [loadingContent, setLoadingContent] = useState(true)
+  const [trabalheForm, setTrabalheForm] = useState({
+    nome: '',
+    email: '',
+    telefone: '',
+    cargo: '',
+    mensagem: '',
+  })
+  const [trabalheLoading, setTrabalheLoading] = useState(false)
+  const [trabalheSuccess, setTrabalheSuccess] = useState(false)
+  const [trabalheError, setTrabalheError] = useState('')
+  const [investidorForm, setInvestidorForm] = useState({
+    nome: '',
+    email: '',
+    telefone: '',
+    tipoInvestimento: '',
+    mensagem: '',
+  })
+  const [investidorLoading, setInvestidorLoading] = useState(false)
+  const [investidorSuccess, setInvestidorSuccess] = useState(false)
+  const [investidorError, setInvestidorError] = useState('')
+
+  useEffect(() => {
+    let mounted = true
+
+    const loadContent = async () => {
+      try {
+        const [jobsRes, investmentsRes] = await Promise.all([
+          fetch('/api/hygraph/content?type=jobs'),
+          fetch('/api/hygraph/content?type=investments'),
+        ])
+
+        const jobsData = await jobsRes.json()
+        const investmentsData = await investmentsRes.json()
+
+        if (!mounted) return
+
+        if (jobsData?.items?.length) {
+          setJobs(jobsData.items)
+          setTrabalheForm((prev) => ({ ...prev, cargo: jobsData.items[0].title }))
+        }
+
+        if (investmentsData?.items?.length) {
+          setInvestments(investmentsData.items)
+          setInvestidorForm((prev) => ({ ...prev, tipoInvestimento: investmentsData.items[0].title }))
+        }
+      } catch (error) {
+        console.warn('Hygraph content loading failed:', error)
+      } finally {
+        if (mounted) setLoadingContent(false)
+      }
+    }
+
+    loadContent()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const tabs = [
     { id: 'fale', label: 'Fale Connosco' },
@@ -17,45 +95,140 @@ export default function ContatoPage() {
     { id: 'investidor', label: 'Portal do Investidor' },
   ] as const
 
+  const handleTrabalheChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setTrabalheForm((prev) => ({ ...prev, [name]: value }))
+
+    if (name === 'cargo') {
+      const index = jobs.findIndex((job) => job.title === value)
+      if (index !== -1) {
+        setActiveJobIndex(index)
+      }
+    }
+  }
+
+  const handleInvestorChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setInvestidorForm((prev) => ({ ...prev, [name]: value }))
+
+    if (name === 'tipoInvestimento') {
+      const index = investments.findIndex((option) => option.title === value)
+      if (index !== -1) {
+        setActiveInvestmentIndex(index)
+      }
+    }
+  }
+
+  const handleTrabalheSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setTrabalheLoading(true)
+    setTrabalheError('')
+    setTrabalheSuccess(false)
+
+    const form = trabalheFormRef.current
+    if (!form) {
+      setTrabalheLoading(false)
+      return
+    }
+
+    try {
+      await sendWorkApplicationForm(form)
+
+      // Persist to Hygraph (server-side) if token and content model exist
+      try {
+        await fetch('/api/hygraph/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'work', data: { ...trabalheForm, cargo: jobs[activeJobIndex]?.title || trabalheForm.cargo } }),
+        })
+      } catch (hyErr) {
+        console.warn('Hygraph submission failed:', hyErr)
+      }
+
+      setTrabalheSuccess(true)
+      setTrabalheForm({ nome: '', email: '', telefone: '', cargo: jobs[activeJobIndex]?.title || trabalheForm.cargo, mensagem: '' })
+      form.reset()
+      const curriculoInput = form.querySelector('input[name="curriculo"]')
+      if (curriculoInput instanceof HTMLInputElement) {
+        curriculoInput.value = ''
+      }
+      setTimeout(() => setTrabalheSuccess(false), 4000)
+    } catch (err) {
+      setTrabalheError('Erro ao enviar candidatura. Tente novamente.')
+      console.error(err)
+    } finally {
+      setTrabalheLoading(false)
+    }
+  }
+
+  const handleInvestorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setInvestidorLoading(true)
+    setInvestidorError('')
+    setInvestidorSuccess(false)
+
+    try {
+      await sendInvestorInterest({
+        ...investidorForm,
+        tipoInvestimento: investidorForm.tipoInvestimento || investments[activeInvestmentIndex]?.title || investidorForm.tipoInvestimento,
+      })
+
+      // Persist investor interest to Hygraph
+      try {
+        await fetch('/api/hygraph/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'investor', data: { ...investidorForm, tipoInvestimento: investidorForm.tipoInvestimento || investments[activeInvestmentIndex]?.title || investidorForm.tipoInvestimento } }),
+        })
+      } catch (hyErr) {
+        console.warn('Hygraph investor submission failed:', hyErr)
+      }
+      setInvestidorSuccess(true)
+      setInvestidorForm({ nome: '', email: '', telefone: '', tipoInvestimento: investments[activeInvestmentIndex]?.title || investidorForm.tipoInvestimento, mensagem: '' })
+      setTimeout(() => setInvestidorSuccess(false), 4000)
+    } catch (err) {
+      setInvestidorError('Erro ao enviar pedido de informação. Tente novamente.')
+      console.error(err)
+    } finally {
+      setInvestidorLoading(false)
+    }
+  }
+
   return (
     <main className="overflow-hidden">
 
-      {/* ============================================================ */}
-      {/*  1. HERO — FULL WIDTH GRADIENT                                */}
-      {/* ============================================================ */}
-      <section className="relative bg-[#021a5c] overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/Imagens/imovel3.png')] bg-cover bg-center opacity-15" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#03113E]/95 via-[#01217B]/90 to-[#03113E]/95" />
+      {/* 1. HERO WITH CHEVRON DIVIDER */}
+      <section className="relative h-auto lg:h-[600px] flex flex-col lg:flex-row overflow-hidden">
+        {/* Image (Background) */}
+        <div className="relative lg:absolute right-0 top-0 w-full lg:w-[64%] h-[300px] lg:h-full z-0 overflow-hidden">
+          <img 
+            src="/heros/customer-service-business-contact-concept-wooden-cube-block-which-print-screen-letter-telephone-email-address-message (2).jpg" 
+            alt="Hero Background"
+            className="w-full h-full object-cover object-left" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#021a5c]/90 via-[#021a5c]/50 to-transparent z-10 pointer-events-none" />
+        </div>
 
-        <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-16 md:py-24 lg:py-28">
-          <div className="max-w-2xl">
-            <span className="inline-block text-sm font-semibold text-[#F5C400] tracking-[0.2em] uppercase mb-5">
+        {/* Camada 2 (Faixa Amarela Intermediária - z-10) */}
+        <div className="hidden lg:block absolute left-0 top-0 w-full h-full bg-[#FFC800] z-10 lg:[clip-path:polygon(0_0,_52%_0,_39%_50%,_52%_100%,_0_100%)]" />
+
+        {/* Camada 3 (Container Azul Principal - z-20) */}
+        <div className="w-full h-3 bg-[#FFC800] lg:hidden" />
+        <div className="relative w-full bg-[#042A8F] p-8 md:p-12 lg:p-20 z-20 flex items-center lg:[clip-path:polygon(0_0,_49%_0,_36%_50%,_49%_100%,_0_100%)]">
+          <div className="max-w-2xl text-white">
+            <span className="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#FFC800] backdrop-blur-sm">
               Contacto
             </span>
-            <h1 className="font-montserrat text-4xl sm:text-5xl md:text-[3.5rem] font-extrabold leading-[1.08] text-white">
-              Contacte-nos
+            <h1 className="mb-4 text-4xl font-extrabold text-white md:text-5xl">
+              Contacte-<span className="text-[#FFC800]">nos</span>
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-slate-200 max-w-lg leading-relaxed font-light">
-              Estamos aqui para ajudar. Escolha a opção que melhor se adequa às suas necessidades.
+            <p className="text-lg md:text-xl text-blue-200/80 font-light max-w-2xl">
+              Estamos aqui para ajudar. Escolha a opção que melhor se adequa às suas necessidades — fale connosco, envie-nos o seu currículo ou explore as oportunidades exclusivas para investidores no mercado angolano.
             </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 pt-10 border-t border-white/10">
-              {[
-                { icon: Phone, label: '+244 912 345 678', sub: 'Telefone' },
-                { icon: Mail, label: 'contato@okukala.ao', sub: 'Email' },
-                { icon: MapPin, label: 'Luanda, Angola', sub: 'Localização' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <span className="flex-shrink-0 w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-[#F5C400]">
-                    <item.icon className="w-5 h-5" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{item.label}</p>
-                    <p className="text-xs text-gray-400">{item.sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -66,26 +239,22 @@ export default function ContatoPage() {
       <section className="py-20 md:py-28 bg-white">
         <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
           {/* Tab Buttons */}
-          <div className="mb-12 flex flex-wrap gap-2 border-b border-gray-200 md:gap-4">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative px-5 py-3 font-semibold transition-colors text-[15px] ${
-                  activeTab === tab.id
-                    ? 'text-[#0A43D8]'
-                    : 'text-gray-500 hover:text-gray-800'
-                }`}
-              >
-                {tab.label}
-                {activeTab === tab.id && (
-                  <span
-                    className="absolute bottom-0 left-0 h-[3px] w-full rounded-full"
-                    style={{ backgroundColor: '#0A43D8' }}
-                  />
-                )}
-              </button>
-            ))}
+          <div className="mb-16 flex justify-center">
+            <div className="inline-flex p-1 bg-gray-100 rounded-2xl">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-8 py-3.5 font-bold text-sm rounded-xl transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? 'bg-white text-[#0A43D8] shadow-sm'
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* ======================================================== */}
@@ -95,7 +264,7 @@ export default function ContatoPage() {
             <div className="grid gap-12 lg:grid-cols-2">
               {/* Info */}
               <div>
-                <span className="inline-block text-sm font-semibold text-[#F5C400] tracking-[0.2em] uppercase mb-4">
+                <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-[0.2em] text-[var(--color-okukala-electric)]">
                   Fale Connosco
                 </span>
                 <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-[#021a5c] leading-tight">
@@ -108,9 +277,9 @@ export default function ContatoPage() {
 
                 <div className="mt-10 space-y-5">
                   {[
-                    { icon: Phone, title: 'Telefone', value: '+244 912 345 678', href: 'tel:+244912345678' },
-                    { icon: Mail, title: 'Email', value: 'contato@okukala.ao', href: 'mailto:contato@okukala.ao' },
-                    { icon: MapPin, title: 'Localização', value: 'Luanda, Angola', href: undefined },
+                    { icon: MapPin, title: 'Localização', value: 'Angola / Huíla / Lubango', href: undefined },
+                    { icon: Phone, title: 'Telefone', value: '923 934 470 / 932 263 593', href: 'tel:+244923934470' },
+                    { icon: Mail, title: 'Email', value: 'okukalaimobiliaria@gmail.com', href: 'mailto:okukalaimobiliaria@gmail.com' },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-4 p-5 rounded-2xl bg-[#f8fafc] border border-gray-100">
                       <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#0A43D8]/10 flex items-center justify-center text-[#0A43D8]">
@@ -129,6 +298,53 @@ export default function ContatoPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Social Media */}
+                <div className="mt-8">
+                  <h3 className="font-montserrat font-bold text-base text-[#021a5c] mb-4">Redes Sociais</h3>
+                  <div className="flex gap-3">
+                    {[
+                      {
+                        href: 'https://www.instagram.com/okukalaimobiliaria?igsh=MW40d2djMzZ4dXlkMA==',
+                        label: 'Instagram',
+                        icon: (
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        href: 'https://www.facebook.com/profile.php?id=61570060736176',
+                        label: 'Facebook',
+                        icon: (
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        href: 'https://www.tiktok.com/@okukalaimobiliaria?is_from_webapp=1&sender_device=pc',
+                        label: 'TikTok',
+                        icon: (
+                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" />
+                          </svg>
+                        ),
+                      },
+                    ].map((s) => (
+                      <a
+                        key={s.label}
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={s.label}
+                        className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0A43D8]/10 text-[#0A43D8] transition-all duration-300 hover:bg-[#0A43D8] hover:text-white"
+                      >
+                        {s.icon}
+                      </a>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Form */}
@@ -144,80 +360,121 @@ export default function ContatoPage() {
           {/*  TAB 2: TRABALHE CONNOSCO                                 */}
           {/* ======================================================== */}
           {activeTab === 'trabalhe' && (
-            <div className="space-y-10">
-              <div className="max-w-2xl">
-                <span className="inline-block text-sm font-semibold text-[#F5C400] tracking-[0.2em] uppercase mb-4">
-                  Carreira
-                </span>
-                <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-[#021a5c] leading-tight">
-                  Oportunidades de{' '}
-                  <span className="text-[#0A43D8]">Carreira</span>
-                </h2>
-                <p className="mt-5 text-gray-500 text-lg leading-relaxed">
-                  Na OKUKALA, valorizamos talento, inovação e compromisso. Junte-se a uma equipa dinâmica que está transformando o mercado imobiliário em Angola.
-                </p>
-              </div>
-
-              {/* Jobs List */}
-              <div>
-                <h3 className="font-montserrat font-bold text-xl text-[#021a5c] mb-6">Vagas Disponíveis</h3>
-                <div className="grid gap-4 md:grid-cols-3">
-                  {[
-                    { title: 'Consultor Imobiliário', location: 'Luanda' },
-                    { title: 'Gestor de Propriedades', location: 'Luanda' },
-                    { title: 'Especialista em Marketing Digital', location: 'Luanda' },
-                  ].map((job, idx) => (
-                    <button
-                      key={idx}
-                      className="group text-left rounded-2xl bg-white border border-gray-100 p-6 hover:shadow-card hover:border-[#0A43D8]/20 transition-all duration-300"
-                    >
-                      <h4 className="font-montserrat font-bold text-base text-[#021a5c] group-hover:text-[#0A43D8] transition-colors">
-                        {job.title}
-                      </h4>
-                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#0A43D8]" />
-                        {job.location}
-                      </p>
-                    </button>
-                  ))}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mt-8">
+              {/* Left Column: Job Carousel */}
+              <div className="lg:col-span-5 flex flex-col bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
+                <div className="flex-grow">
+                  {loadingContent ? (
+                    <div className="h-64 w-full rounded-2xl mb-6 animate-pulse bg-slate-200" />
+                  ) : jobs.length > 0 ? (
+                    <>
+                      <div className="h-64 w-full rounded-2xl mb-6 overflow-hidden">
+                        <img src={jobs[activeJobIndex]?.image || ''} alt={jobs[activeJobIndex]?.title || 'Oportunidade'} className="w-full h-full object-cover" />
+                      </div>
+                      <span className="inline-block bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-3">
+                        {jobs[activeJobIndex]?.location || 'Luanda'}
+                      </span>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">{jobs[activeJobIndex]?.title || 'Oportunidade'}</h3>
+                      <p className="text-sm text-slate-600 mb-5">{jobs[activeJobIndex]?.description || ''}</p>
+                      
+                      <div className="mb-6">
+                        <h4 className="text-sm font-bold text-slate-900 mb-2">Requisitos:</h4>
+                        <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+                          {(jobs[activeJobIndex]?.requirements?.length ? jobs[activeJobIndex].requirements : []).map((req, i) => <li key={i}>{req}</li>)}
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+                      Sem vagas disponíveis no momento.
+                    </div>
+                  )}
                 </div>
+                
+                {!loadingContent && jobs.length > 0 && (
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                    <span className="text-sm font-semibold text-slate-500">{jobs.length ? `${activeJobIndex + 1} / ${jobs.length}` : '0 / 0'}</span>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => setActiveJobIndex((prev) => (prev === 0 ? Math.max(jobs.length - 1, 0) : prev - 1))}
+                        className="p-3 rounded-full bg-slate-100 hover:bg-[#0A43D8] text-slate-600 hover:text-white transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => setActiveJobIndex((prev) => (prev === Math.max(jobs.length - 1, 0) ? 0 : prev + 1))}
+                        className="p-3 rounded-full bg-slate-100 hover:bg-[#0A43D8] text-slate-600 hover:text-white transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Application Form */}
-              <div className="rounded-2xl bg-[#f8fafc] border border-gray-100 p-8 lg:p-10">
+              {/* Right Column: Application Form */}
+              <div className="lg:col-span-7 rounded-2xl bg-[#f8fafc] border border-gray-100 p-8 lg:p-10">
                 <h3 className="font-montserrat font-bold text-xl text-[#021a5c] mb-6">Envie-nos o seu Currículo</h3>
-                <form className="space-y-5">
+                <form
+                  ref={trabalheFormRef}
+                  onSubmit={handleTrabalheSubmit}
+                  encType="multipart/form-data"
+                  method="post"
+                  className="space-y-5"
+                >
                   <div className="grid gap-5 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Nome Completo</label>
-                      <input type="text" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="Seu nome" />
+                      <input type="text" name="nome" value={trabalheForm.nome} onChange={handleTrabalheChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="Seu nome" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Email</label>
-                      <input type="email" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="seu@email.com" />
+                      <input type="email" name="email" value={trabalheForm.email} onChange={handleTrabalheChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="seu@email.com" />
                     </div>
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Telefone</label>
-                      <input type="tel" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="+244 912 345 678" />
+                      <input type="tel" name="telefone" value={trabalheForm.telefone} onChange={handleTrabalheChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="+244 912 345 678" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Cargo de Interesse</label>
-                      <select className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none">
-                        <option>Seleccione uma vaga</option>
-                        <option>Consultor Imobiliário</option>
-                        <option>Gestor de Propriedades</option>
-                        <option>Especialista em Marketing Digital</option>
+                      <select
+                        name="cargo"
+                        value={trabalheForm.cargo}
+                        onChange={handleTrabalheChange}
+                        className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none"
+                      >
+                        {jobs.map((job) => <option key={job.title} value={job.title}>{job.title}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-600 mb-1.5">Mensagem</label>
-                    <textarea rows={4} className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none resize-none" placeholder="Conte-nos um pouco sobre você..." />
+                    <textarea name="mensagem" value={trabalheForm.mensagem} onChange={handleTrabalheChange} rows={4} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none resize-none" placeholder="Conte-nos um pouco sobre você..." />
                   </div>
-                  <button type="submit" className={buttonVariants({ className: 'w-full bg-[#0A43D8] hover:bg-[#042A8F]' })}>
-                    Enviar Candidatura
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-600 mb-1.5">Currículo</label>
+                    <input
+                      type="file"
+                      name="curriculo"
+                      accept=".pdf,.doc,.docx"
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-[#0A43D8] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#042A8F]"
+                    />
+                    <p className="mt-2 text-xs text-gray-500">Anexe o seu currículo em PDF, DOC ou DOCX.</p>
+                  </div>
+                  {trabalheError && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-600">
+                      {trabalheError}
+                    </div>
+                  )}
+                  {trabalheSuccess && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-medium text-green-600">
+                      Candidatura enviada com sucesso. A nossa equipa irá entrar em contacto.
+                    </div>
+                  )}
+                  <button type="submit" disabled={trabalheLoading} className="w-full bg-[#0A43D8] hover:bg-[#042A8F] text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#0A43D8]/20 disabled:opacity-60">
+                    {trabalheLoading ? 'Enviando...' : 'Enviar Candidatura'}
                   </button>
                 </form>
               </div>
@@ -228,74 +485,98 @@ export default function ContatoPage() {
           {/*  TAB 3: PORTAL DO INVESTIDOR                              */}
           {/* ======================================================== */}
           {activeTab === 'investidor' && (
-            <div className="space-y-10">
-              <div className="max-w-2xl">
-                <span className="inline-block text-sm font-semibold text-[#F5C400] tracking-[0.2em] uppercase mb-4">
-                  Investimento
-                </span>
-                <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-[#021a5c] leading-tight">
-                  Oportunidades de{' '}
-                  <span className="text-[#0A43D8]">Investimento</span>
-                </h2>
-                <p className="mt-5 text-gray-500 text-lg leading-relaxed">
-                  Explore oportunidades de investimento imobiliário de alta rentabilidade em Angola. O mercado imobiliário oferece retornos atractivos para investidores estratégicos.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mt-8">
+              {/* Left Column: Investment Card */}
+              <div className="lg:col-span-5 flex flex-col bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
+                <div className="flex-grow">
+                  {loadingContent ? (
+                    <div className="h-64 w-full rounded-2xl mb-6 animate-pulse bg-slate-200" />
+                  ) : investments.length > 0 ? (
+                    <>
+                      <div className="h-64 w-full rounded-2xl mb-6 overflow-hidden">
+                        <img src={investments[activeInvestmentIndex]?.image || ''} alt={investments[activeInvestmentIndex]?.title || 'Oportunidade'} className="w-full h-full object-cover" />
+                      </div>
+                      <span className="inline-block bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full w-fit mb-3 uppercase tracking-wider">
+                        Oportunidade de Investimento
+                      </span>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">{investments[activeInvestmentIndex]?.title || 'Oportunidade'}</h3>
+                      <p className="text-sm text-slate-600 mb-5">{investments[activeInvestmentIndex]?.description || ''}</p>
+                    </>
+                  ) : (
+                    <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+                      Sem oportunidades de investimento disponíveis no momento.
+                    </div>
+                  )}
+                </div>
 
-              {/* Investment Options */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {[
-                  { title: 'Residential', description: 'Investimentos em habitação residencial de qualidade' },
-                  { title: 'Comercial', description: 'Espaços comerciais prime location' },
-                  { title: 'Industrial', description: 'Propriedades para fins industriais' },
-                  { title: 'Desenvolvimento', description: 'Projectos de desenvolvimento imobiliário' },
-                ].map((option, idx) => (
-                  <div key={idx} className="group rounded-2xl bg-[#f8fafc] border border-gray-100 p-7 hover:shadow-card hover:border-[#0A43D8]/20 transition-all duration-300">
-                    <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#0A43D8]/10 text-[#0A43D8] mb-5 group-hover:bg-[#0A43D8] group-hover:text-white transition-colors duration-300">
-                      <Star className="w-6 h-6" />
-                    </span>
-                    <h3 className="font-montserrat font-bold text-base text-[#021a5c]">{option.title}</h3>
-                    <p className="text-sm text-gray-500 mt-2">{option.description}</p>
+                {!loadingContent && investments.length > 0 && (
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+                    <span className="text-sm font-semibold text-slate-500">{investments.length ? `${activeInvestmentIndex + 1} / ${investments.length}` : '0 / 0'}</span>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => setActiveInvestmentIndex((prev) => (prev === 0 ? Math.max(investments.length - 1, 0) : prev - 1))}
+                        className="p-3 rounded-full bg-slate-100 hover:bg-[#0A43D8] text-slate-600 hover:text-white transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button 
+                        onClick={() => setActiveInvestmentIndex((prev) => (prev === Math.max(investments.length - 1, 0) ? 0 : prev + 1))}
+                        className="p-3 rounded-full bg-slate-100 hover:bg-[#0A43D8] text-slate-600 hover:text-white transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
-                ))}
+                )}
               </div>
 
-              {/* Investor Form */}
-              <div className="rounded-2xl bg-[#f8fafc] border border-gray-100 p-8 lg:p-10">
+              {/* Right Column: Investor Form */}
+              <div className="lg:col-span-7 rounded-2xl bg-[#f8fafc] border border-gray-100 p-8 lg:p-10">
                 <h3 className="font-montserrat font-bold text-xl text-[#021a5c] mb-6">Manifestar Interesse</h3>
-                <form className="space-y-5">
+                <form onSubmit={handleInvestorSubmit} className="space-y-5">
                   <div className="grid gap-5 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Nome</label>
-                      <input type="text" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="Seu nome" />
+                      <input type="text" name="nome" value={investidorForm.nome} onChange={handleInvestorChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="Seu nome" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Email</label>
-                      <input type="email" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="seu@email.com" />
+                      <input type="email" name="email" value={investidorForm.email} onChange={handleInvestorChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="seu@email.com" />
                     </div>
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Telefone</label>
-                      <input type="tel" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="+244 912 345 678" />
+                      <input type="tel" name="telefone" value={investidorForm.telefone} onChange={handleInvestorChange} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none" placeholder="+244 912 345 678" />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-gray-600 mb-1.5">Tipo de Investimento</label>
-                      <select className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none">
-                        <option>Seleccione</option>
-                        <option>Residential</option>
-                        <option>Comercial</option>
-                        <option>Industrial</option>
-                        <option>Desenvolvimento</option>
+                      <select
+                        name="tipoInvestimento"
+                        value={investidorForm.tipoInvestimento}
+                        onChange={handleInvestorChange}
+                        className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none"
+                      >
+                        {investments.map((opt) => <option key={opt.title} value={opt.title}>{opt.title}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-600 mb-1.5">Mensagem</label>
-                    <textarea rows={5} className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none resize-none" placeholder="Descreva seu interesse e preferências de investimento..." />
+                    <textarea name="mensagem" value={investidorForm.mensagem} onChange={handleInvestorChange} rows={5} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none resize-none" placeholder="Descreva seu interesse e preferências de investimento..." />
                   </div>
-                  <button type="submit" className={buttonVariants({ className: 'w-full bg-[#0A43D8] hover:bg-[#042A8F]' })}>
-                    Solicitar Informações
+                  {investidorError && (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-600">
+                      {investidorError}
+                    </div>
+                  )}
+                  {investidorSuccess && (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-3 text-sm font-medium text-green-600">
+                      Pedido de informação enviado com sucesso. Responderemos em breve.
+                    </div>
+                  )}
+                  <button type="submit" disabled={investidorLoading} className="w-full bg-[#0A43D8] hover:bg-[#042A8F] text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#0A43D8]/20 disabled:opacity-60">
+                    {investidorLoading ? 'Enviando...' : 'Solicitar Informações'}
                   </button>
                 </form>
               </div>
@@ -306,35 +587,7 @@ export default function ContatoPage() {
 
       {/* Map Section */}
       <MapSection />
-
-      {/* ============================================================ */}
-      {/*  BOTTOM FEATURES BAR                                          */}
-      {/* ============================================================ */}
-      <section className="bg-[#03113E] py-10 border-t border-white/10">
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: Shield, title: 'Segurança Garantida', desc: 'Todas as transações são protegidas' },
-              { icon: Users, title: 'Equipe Especializada', desc: 'Profissionais experientes' },
-              { icon: Globe, title: 'Cobertura Nacional', desc: 'Imóveis em todo o país' },
-              { icon: CheckCircle, title: 'Documentação OK', desc: 'Papelária sempre em ordem' },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="bg-white/5 border border-white/10 backdrop-blur-md rounded-xl p-4 flex items-center gap-3"
-              >
-                <span className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#FFC800]/10 flex items-center justify-center text-[#FFC800]">
-                  <item.icon className="w-5 h-5" />
-                </span>
-                <div>
-                  <p className="text-white text-xs md:text-sm font-semibold">{item.title}</p>
-                  <p className="text-gray-400 text-[11px] md:text-xs mt-0.5">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   )
 }
+

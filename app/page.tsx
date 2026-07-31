@@ -187,12 +187,12 @@ export default function Page() {
               <p className="mt-4 text-gray-500 text-lg">Selecionados especialmente para si.</p>
             </div>
 
-            <Link
-              href="/imoveis"
-              className={buttonVariants({ className: 'bg-[#0A43D8] text-white hover:bg-[#042A8F]' })}
-            >
-              Ver todos <ArrowRight className="w-4 h-4 ml-1" />
-            </Link>
+              <Link
+                href="/imoveis"
+                className={buttonVariants({ className: 'bg-[#0A43D8] text-white hover:bg-[#FFC800] hover:text-[#03113E]' })}
+              >
+                Ver todos <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
@@ -237,7 +237,7 @@ export default function Page() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-6">
-                      <p className="font-montserrat font-extrabold text-[#0A43D8] text-xl">
+                      <p className="font-montserrat font-extrabold text-[#E5A800] text-xl">
                         {p.price}
                       </p>
                   <span className={buttonVariants({ className: 'bg-transparent text-[#0A43D8] hover:text-[#021a5c] flex items-center gap-1 transition-colors' })}>
@@ -294,7 +294,7 @@ export default function Page() {
               <span className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#F5C400]/15 text-[#F5C400] mb-7">
                 <Star className="w-8 h-8" />
               </span>
-              <h3 className="font-montserrat font-bold text-xl text-white mb-4">OKUKALA Premium</h3>
+              <h3 className="font-montserrat font-bold text-xl text-white mb-4">OKUKALA </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
                 Área exclusiva para investidores de elevado património. Foco em ativos de luxo: moradias, penthouses, resorts e hotéis.
               </p>
@@ -304,7 +304,7 @@ export default function Page() {
           <div className="mt-16 text-center">
             <Link
               href="/contato#portal-investidor"
-              className={buttonVariants({ className: 'bg-[#F5C400] text-[#021a5c] font-semibold shadow-md hover:bg-yellow-400 py-2.5 px-6 text-sm rounded-lg' })}
+              className={buttonVariants({ className: 'bg-[#F5C400] text-[#021a5c] font-semibold shadow-md hover:bg-yellow-400 py-2.5 px-7 text-sm rounded-lg' })}
             >
               Conheça o Portal do Investidor
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -330,7 +330,7 @@ export default function Page() {
             </div>
               <a
                 href="/blog"
-                className={buttonVariants({ className: 'bg-[#0A43D8] text-white hover:bg-[#042A8F]' })}
+                className={buttonVariants({ className: 'bg-[#0A43D8] text-white hover:bg-[#FFC800] hover:text-[#03113E]' })}
               >
                 Ver todas <ArrowRight className="w-4 h-4 ml-1" />
               </a>

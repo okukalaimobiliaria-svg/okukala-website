@@ -99,6 +99,20 @@ export const GET_RELATED_IMOVEIS = `
   }
 `
 
+export const GET_RELATED_BLOGS = `
+  query GetRelatedBlogs($slug: String!, $first: Int!) {
+    blogs(where: { slug_not: $slug }, first: $first, orderBy: dataDePublicacao_DESC) {
+      id
+      titulo
+      slug
+      resumo
+      dataDePublicacao
+      imagemDeCapa { url }
+      categoria
+    }
+  }
+`
+
 export const GET_BLOGS = `
   query GetBlogs {
     blogs(orderBy: dataDePublicacao_DESC, first: 20) {
