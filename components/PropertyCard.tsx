@@ -53,7 +53,7 @@ export function PropertyCard({
         </h3>
 
         {/* Price */}
-        <p className="mb-2 text-2xl font-extrabold text-[#FFC800]">{formatPrice(preco)}</p>
+        <p className="mb-2 text-2xl font-extrabold text-[#E5A800]">{formatPrice(preco)}</p>
 
         {/* Location */}
         <div className="mb-4 flex items-center gap-1.5 text-sm text-gray-500">
@@ -62,29 +62,29 @@ export function PropertyCard({
         </div>
 
         {/* Features */}
-        <div className="flex flex-wrap gap-3 border-t border-gray-100 pt-4">
+        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
           {quartos !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">
                 <Bed size={14} className="text-[#0A43D8]" />
               </div>
-              <span>{quartos} qts</span>
+              <span className="font-semibold">{quartos} qts</span>
             </div>
           )}
           {vagas !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">
                 <Bath size={14} className="text-[#0A43D8]" />
               </div>
-              <span>{vagas} vagas</span>
+              <span className="font-semibold">{vagas} vgs</span>
             </div>
           )}
           {area !== undefined && (
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">
                 <Maximize2 size={14} className="text-[#0A43D8]" />
               </div>
-              <span>{area} m²</span>
+              <span className="font-semibold">{area} m²</span>
             </div>
           )}
         </div>

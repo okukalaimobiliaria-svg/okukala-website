@@ -52,7 +52,7 @@ export function FiltrosImovel({ onFiltroChange }: FiltrosImovelProps) {
         {/* Preço Mínimo */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-900">
-            Preço Mínimo
+            Preço Mínimo (Kz)
           </label>
           <input
             type="number"
@@ -66,7 +66,7 @@ export function FiltrosImovel({ onFiltroChange }: FiltrosImovelProps) {
         {/* Preço Máximo */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-900">
-            Preço Máximo
+            Preço Máximo (Kz)
           </label>
           <input
             type="number"
@@ -112,7 +112,7 @@ export function FiltrosImovel({ onFiltroChange }: FiltrosImovelProps) {
             {/* Preço Mínimo */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-900">
-                Preço Mínimo
+                Preço Mínimo (Kz)
               </label>
               <input
                 type="number"
@@ -126,7 +126,7 @@ export function FiltrosImovel({ onFiltroChange }: FiltrosImovelProps) {
             {/* Preço Máximo */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-900">
-                Preço Máximo
+                Preço Máximo (Kz)
               </label>
               <input
                 type="number"

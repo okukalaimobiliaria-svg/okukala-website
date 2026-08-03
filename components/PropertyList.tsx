@@ -108,23 +108,21 @@ export function PropertyList({ properties }: PropertyListProps) {
   }
 
   return (
-    <div className="lg:flex lg:gap-16 lg:overflow-visible">
+    <div className="lg:flex lg:items-start lg:gap-16 lg:overflow-visible">
       {/* Sidebar */}
-      <aside className="lg:w-96 flex-shrink-0 lg:-ml-[max(0px,calc((100vw-1400px)/2))] lg:pl-16 xl:pl-20">
-        <div className="sticky top-24">
-          <PropertyFilters
-            tipoOferta={filters.tipoOferta}
-            cidade={filters.cidade}
-            precoMin={filters.precoMin}
-            precoMax={filters.precoMax}
-            categoria={filters.categoria}
-            quartos={filters.quartos}
-            cities={cities}
-            onChange={handleFilterChange}
-            onClear={handleClearFilters}
-            hasFilters={hasFilters}
-          />
-        </div>
+      <aside className="lg:w-96 flex-shrink-0 lg:sticky lg:top-32 lg:self-start lg:-ml-[max(0px,calc((100vw-1400px)/2))] lg:pl-16 xl:pl-20">
+        <PropertyFilters
+          tipoOferta={filters.tipoOferta}
+          cidade={filters.cidade}
+          precoMin={filters.precoMin}
+          precoMax={filters.precoMax}
+          categoria={filters.categoria}
+          quartos={filters.quartos}
+          cities={cities}
+          onChange={handleFilterChange}
+          onClear={handleClearFilters}
+          hasFilters={hasFilters}
+        />
       </aside>
 
       {/* Content */}
@@ -173,12 +171,18 @@ export function PropertyList({ properties }: PropertyListProps) {
             )}
           </>
         ) : (
-          <div className="rounded-2xl border border-gray-100 bg-white p-16 text-center shadow-lg">
+            <div className="rounded-2xl border border-gray-100 bg-white p-16 text-center shadow-lg">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
               <Building2 size={28} className="text-gray-400" />
             </div>
             <h3 className="mb-2 text-lg font-bold text-[#03113E]">Nenhum imóvel encontrado</h3>
-            <p className="text-sm text-gray-500">Tente ajustar os filtros para ver mais resultados.</p>
+            <p className="text-sm text-gray-500 mb-6">Tente ajustar os filtros para ver mais resultados.</p>
+            <button 
+              onClick={handleClearFilters}
+              className="inline-flex items-center justify-center bg-[#0A43D8] hover:bg-[#FFC800] hover:text-[#03113E] text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300"
+            >
+              Limpar Filtros
+            </button>
           </div>
         )}
       </div>

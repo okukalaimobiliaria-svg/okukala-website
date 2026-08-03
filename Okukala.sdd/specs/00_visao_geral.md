@@ -7,7 +7,7 @@ Site institucional e imobiliário para a OKUKALA. Deve permitir a divulgação d
 - **Frontend/Backend:** Next.js (React)
 - **CMS (Gestão de Conteúdo):** Hygraph (já configurado parcialmente)
 - **Formulários:** EmailJS (já configurado parcialmente)
-- **Estilização:** A definir (sugiro Tailwind CSS para facilitar, mas o cliente pode escolher CSS puro ou Styled Components). Vamos usar Tailwind CSS por ser mais rápido para a IA gerar código bonito.
+- **Estilização:** A definir (sugiro Tailwind CSS para facilitar, mas o cliente pode escolher CSS puro ou Styled Components). Vamos usar Tailwind CSS por ser mais rápido para se gerar código bonito.
 - **Analytics:** Google Analytics
 - **SSL:** Certificado automático (Vercel/Netlify)
 

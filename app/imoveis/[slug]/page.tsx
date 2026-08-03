@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Bed, Bath, Maximize2, MapPin, ArrowLeft, Share2, Heart, Phone, CheckCircle2, Navigation } from 'lucide-react'
+import { Bed, Bath, Maximize2, MapPin, ArrowLeft, Share2, Heart, Phone, CheckCircle2 } from 'lucide-react'
 import { ImageGallery } from '@/components/ImageGallery'
 import { PropertyCard } from '@/components/PropertyCard'
 import { PropertyDetailClient } from '@/components/PropertyDetailClient'
@@ -193,8 +193,8 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
               />
 
               {/* Description Box */}
-              <div className="rounded-2xl border border-gray-100 bg-white px-6 sm:px-8 lg:px-12 py-8 shadow-sm">
-                <h2 className="mb-6 text-2xl font-extrabold text-[#03113E] tracking-tight border-b border-gray-100 pb-4">
+              <div className="rounded-2xl border border-gray-100 bg-white px-6 sm:px-8 lg:px-10 py-8 shadow-sm">
+                <h2 className="mb-5 text-2xl font-extrabold text-[#03113E] tracking-tight border-b border-gray-100 pb-4">
                   Sobre este Imóvel
                 </h2>
                 <CollapsibleDescription html={property.descricao.html} />
@@ -262,19 +262,21 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                       </p>
                     </div>
 
-                    {property.oQueHaProximo && property.oQueHaProximo.length > 0 && (
-                      <div>
-                        <h3 className="mb-3 text-base font-bold text-[#03113E]">O que há próximo?</h3>
-                        <ul className="space-y-2.5">
-                          {property.oQueHaProximo.map((item, i) => (
-                            <li key={`${item}-${i}`} className="flex items-center gap-2.5 text-sm font-medium text-gray-600">
-                              <Navigation size={14} className="text-[#0A43D8] flex-shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-4">
+                      <h3 className="mb-3 text-base font-bold text-[#03113E]">Por que este imóvel destaca-se</h3>
+                      <ul className="space-y-2.5 text-sm font-medium text-gray-600">
+                        {[
+                          'Localização privilegiada e excelente acessibilidade',
+                          'Espaço bem distribuído e funcional',
+                          'Ótima oportunidade para residência ou investimento',
+                        ].map((item, i) => (
+                          <li key={`${item}-${i}`} className="flex items-start gap-2.5">
+                            <CheckCircle2 size={15} className="mt-0.5 text-[#0A43D8] flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -365,8 +367,12 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                       rel="noreferrer"
                       className="flex items-center justify-center gap-2 rounded-xl bg-[#22c55e] px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#16a34a]"
                     >
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.47-.149-.67.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.174.199-.297.299-.496.099-.198.05-.372-.025-.521-.074-.149-.669-1.612-.92-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.073.149.198 2.095 3.2 5.076 4.487.709.306 1.263.49 1.694.626.712.227 1.36.195 1.872.118.572-.086 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor" 
+                        className="h-5 w-5"
+                      >
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.47-.149-.67.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.174.199-.297.299-.496.099-.198.05-.372-.025-.521-.074-.149-.669-1.612-.92-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.073.149.198 2.095 3.2 5.076 4.487.709.306 1.263.49 1.694.626.712.227 1.36.195 1.872.118.572-.086 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                       </svg>
                       Falar no WhatsApp
                     </a>

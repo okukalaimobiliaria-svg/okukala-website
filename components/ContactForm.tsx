@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { sendContactForm } from '@/lib/emailjs'
-import { buttonVariants } from '@/components/ui/button'
 
 export function ContactForm() {
   const searchParams = useSearchParams()
@@ -160,7 +159,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={loading}
-        className={buttonVariants({ className: 'w-full rounded-full bg-[#FFC800] text-[#03113E] hover:bg-[#FFE066]' })}
+        className="w-full bg-[#0A43D8] hover:bg-[#042A8F] text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#0A43D8]/20 disabled:opacity-60"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">

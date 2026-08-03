@@ -21,10 +21,10 @@ export interface FeaturedProperty {
 }
 
 export const services = [
-  { icon: Home, label: 'Venda e arrendamento de residências', image: '/Imagens/imovel1.png' },
-  { icon: LandPlot, label: 'Venda de terrenos e fazendas', image: '/Imagens/imovel3.png' },
-  { icon: BadgeCheck, label: 'Avaliação de terrenos e imóveis', image: '/Imagens/imovel2.png' },
-  { icon: Building2, label: 'Gestão de propriedades', image: '/Imagens/imovel5.png' },
+  { icon: Home, label: 'Venda e arrendamento de residências', image: '/Serviços/pexels-rdne-8293778.jpg' },
+  { icon: LandPlot, label: 'Venda de terrenos e fazendas', image: '/Serviços/pexels-shootsaga-36946235.jpg' },
+  { icon: BadgeCheck, label: 'Avaliação de terrenos e imóveis', image: '/Serviços/pexels-thirdman-8470774 (2).jpg' },
+  { icon: Building2, label: 'Gestão de propriedades', image: '/Serviços/pexels-aysegul-aytoren-46790226-18821289.jpg' },
 ]
 
 export const categories = [

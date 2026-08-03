@@ -1,16 +1,27 @@
 import { GraphQLClient } from 'graphql-request'
 
-const endpoint = process.env.NEXT_PUBLIC_HYGRAPH_URL
+export const hygraphEndpoint = process.env.NEXT_PUBLIC_HYGRAPH_URL || 'https://api-eu-west-2.hygraph.com/v2/cmrjqsukb04q406vu1edxky40/master'
 
-if (!endpoint) {
+if (!process.env.NEXT_PUBLIC_HYGRAPH_URL) {
   console.warn('[Hygraph] NEXT_PUBLIC_HYGRAPH_URL not configured. Using placeholder.')
 }
 
-export const hygraphClient = new GraphQLClient(endpoint || 'https://api-eu-west-2.hygraph.com/v2/cmrjqsukb04q406vu1edxky40/master', {
+export const hygraphClient = new GraphQLClient(hygraphEndpoint, {
   headers: {
     'Content-Type': 'application/json',
   },
 })
+
+export function createHygraphClient(adminToken?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  if (adminToken) {
+    headers['Authorization'] = `Bearer ${adminToken}`
+  }
+
+  return new GraphQLClient(hygraphEndpoint, { headers })
+}
 
 // TypeScript types
 export interface Imovel {
