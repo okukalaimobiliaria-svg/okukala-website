@@ -18,13 +18,13 @@ import {
 /* ------------------------------------------------------------------ */
 
 const team = [
-  { nome: 'Francisco Mukevela Kukala', cargo: 'Direcção Geral', image: '/Fotografias%20Corporativas/IMG_8978%20-%20okukala%20imobili%C3%A1ria.jpg' },
-  { nome: 'Pedro Tchivia', cargo: 'Direcção Operacional', image: '/Fotografias%20Corporativas/IMG_8981%20-%20okukala%20imobili%C3%A1ria.jpg' },
-  { nome: 'Arone Tchimbassi', cargo: 'Departamento Financeiro', image: '/Fotografias%20Corporativas/IMG_9052.jpg' },
-  { nome: 'Isaac Simão', cargo: 'Departamento Administrativo', image: '/Fotografias%20Corporativas/IMG_8967%20-%20okukala%20imobili%C3%A1ria.jpg' },
-  { nome: 'José Rafael', cargo: 'Comercial', image: '/Fotografias%20Corporativas/IMG_9042.jpg' },
-  { nome: 'Lucimila Lucas', cargo: 'Comercial', image: '/Fotografias%20Corporativas/IMG_9036.jpg' },
-  { nome: 'Viriato Chipenda', cargo: 'Comercial', image: '/Fotografias%20Corporativas/IMG_9015.jpg' },
+  { nome: 'Francisco Kukala', cargo: 'Director Geral', image: '/Fotografias%20Corporativas/Francisco%20Okukala.jpg' },
+  { nome: 'Isaac Simão', cargo: 'Director Operacional', image: '/Fotografias%20Corporativas/ISAAC%20SIM%C3%83O.jpg' },
+  { nome: 'Pedro Tchivia', cargo: 'Director de Marketing', image: '/Fotografias%20Corporativas/Pedro%20Tchivia.jpeg' },
+  { nome: 'Arone Chimbassi', cargo: 'Gestor de RH & Finanças', image: '/Fotografias%20Corporativas/ARONE%20CHIMBASSI.jpg' },
+  { nome: 'Viriato Chipenda', cargo: 'Consultor Imobiliário', image: '/Fotografias%20Corporativas/VIRIATO%20CHIPENDA.jpg' },
+  { nome: 'José Rafael', cargo: 'Consultor Imobiliário', image: '/Fotografias%20Corporativas/JOS%C3%89%20RAFAEL.jpg' },
+  { nome: 'Lucimila Lucas', cargo: 'Consultora Imobiliária', image: '/Fotografias%20Corporativas/LUCIMILA%20LUCAS.jpg' },
 ]
 
 const partners = [
@@ -131,19 +131,19 @@ export default function SobrePage() {
                 </p>
               </div>
 
-              {/* Stats Counters */}
+                {/* Stats Counters */}
               <div className="grid grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100 text-center sm:text-left">
                 <div>
-                  <p className="text-3xl sm:text-4xl font-extrabold text-[var(--color-okukala-primary)] font-montserrat">150+</p>
-                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Imóveis</p>
+                  <p className="text-3xl sm:text-4xl font-extrabold text-[var(--color-okukala-primary)] font-montserrat">18+</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Imóveis Listados</p>
                 </div>
                 <div>
                   <p className="text-3xl sm:text-4xl font-extrabold text-[var(--color-okukala-primary)] font-montserrat">98%</p>
-                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Clientes satisfeitos</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Clientes Satisfeitos</p>
                 </div>
                 <div>
-                  <p className="text-3xl sm:text-4xl font-extrabold text-[var(--color-okukala-primary)] font-montserrat">10+</p>
-                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Anos</p>
+                  <p className="text-3xl sm:text-4xl font-extrabold text-[var(--color-okukala-primary)] font-montserrat">2+</p>
+                  <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Anos de Experiência</p>
                 </div>
               </div>
 
@@ -273,35 +273,82 @@ export default function SobrePage() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
-            {team.map((membro, idx) => {
-              // Verifica se é a última linha e se tem apenas um membro para centralizar
-              const isLastRowSingle = team.length % 3 !== 0 && idx === team.length - 1;
-              return (
-                <div
-                  key={idx}
-                  className={`group rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
-                    isLastRowSingle ? 'sm:col-span-2 lg:col-span-1 lg:col-start-2' : ''
-                  }`}
-                >
-                  <div className="aspect-[4/5] overflow-hidden">
-                    <img
-                      src={membro.image}
-                      alt={membro.nome}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-4 text-center">
-                    <h3 className="font-montserrat font-bold text-sm text-[var(--color-okukala-primary)]">
-                      {membro.nome}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-[var(--color-okukala-electric)] font-poppins font-medium">
-                      {membro.cargo}
-                    </p>
-                  </div>
+          {/* Row 1: 1 card */}
+          <div className="flex justify-center mb-6">
+            {team.slice(0, 1).map((membro, idx) => (
+              <div
+                key={idx}
+                className="group rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 w-full max-w-xs"
+              >
+                <div className="aspect-[4/5] overflow-hidden">
+                  <img
+                    src={membro.image}
+                    alt={membro.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
-              );
-            })}
+                <div className="p-4 text-center">
+                  <h3 className="font-montserrat font-bold text-sm text-[var(--color-okukala-primary)]">
+                    {membro.nome}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[var(--color-okukala-electric)] font-poppins font-medium">
+                    {membro.cargo}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 2: 3 cards */}
+          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto mb-6">
+            {team.slice(1, 4).map((membro, idx) => (
+              <div
+                key={idx + 1}
+                className="group rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+              >
+                <div className="aspect-[4/5] overflow-hidden">
+                  <img
+                    src={membro.image}
+                    alt={membro.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-montserrat font-bold text-sm text-[var(--color-okukala-primary)]">
+                    {membro.nome}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[var(--color-okukala-electric)] font-poppins font-medium">
+                    {membro.cargo}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Row 3: 3 cards */}
+          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+            {team.slice(4, 7).map((membro, idx) => (
+              <div
+                key={idx + 4}
+                className="group rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+              >
+                <div className="aspect-[4/5] overflow-hidden">
+                  <img
+                    src={membro.image}
+                    alt={membro.nome}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-montserrat font-bold text-sm text-[var(--color-okukala-primary)]">
+                    {membro.nome}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[var(--color-okukala-electric)] font-poppins font-medium">
+                    {membro.cargo}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

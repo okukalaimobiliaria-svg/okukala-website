@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Map, Car, Bike, Footprints, Navigation, MapPin } from 'lucide-react'
+import { Map, Car, Bike, Footprints, Navigation } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
@@ -13,10 +13,10 @@ const LOCATION_COORDS = {
 }
 
 export function MapSection() {
-  const [mapType, setMapType] = useState<'m' | 'k' | 'p'>('m') // m=standard, k=satellite, p=terrain
+  const [mapType, setMapType] = useState<'m' | 'k' | 'p'>('k') // m=standard, k=satellite, p=terrain
   const [origin, setOrigin] = useState('')
   const [travelMode, setTravelMode] = useState<'driving' | 'bicycling' | 'walking'>('driving')
-  const [mapSrc, setMapSrc] = useState(LOCATION_COORDS.m)
+  const [mapSrc, setMapSrc] = useState(LOCATION_COORDS.k)
   const [routeActive, setRouteActive] = useState(false)
 
   const handleTraceRoute = () => {
@@ -61,7 +61,7 @@ export function MapSection() {
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg text-[#021a5c]">
+            <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg texto-[#021a5c]">
               <Navigation className="w-5 h-5" />
               <span className="font-bold">Planeador de Rota</span>
             </div>
@@ -89,7 +89,7 @@ export function MapSection() {
             {routeActive && (
               <button
                 onClick={clearRoute}
-                className="ml-2 px-4 py-2 rounded-md bg-white border border-gray-200 text-sm text-[#0A43D8] hover:bg-gray-50"
+                className="ml-2 px-4 py-2 rounded-md bg-white border border-gray-200 texto-sm text-[#0A43D8] hover:bg-gray-50"
               >
                 Limpar Rota
               </button>
@@ -97,19 +97,20 @@ export function MapSection() {
           </div>
         </div>
 
-        <div className="relative rounded-2xl overflow-hidden shadow-lg h-[500px]">
+        <div className="relative rounded-2xl overflow-hidden shadow-lg h-[400px] md:h-[500px] bg-gray-200">
           <iframe
             src={routeActive ? mapSrc : LOCATION_COORDS[mapType]}
-            className="w-full h-full"
-            frameBorder="0"
+            className="w-full h-full border-0"
             allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
             title={routeActive ? 'Rota no mapa' : 'Mapa Okukala'}
           />
-
-          <div className="absolute bottom-4 left-4 bg-white rounded-lg p-2 flex gap-2 shadow-md">
-            <button onClick={() => setMapType('m')} className={`px-3 py-1 text-sm rounded ${mapType === 'm' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Padrão</button>
-            <button onClick={() => setMapType('k')} className={`px-3 py-1 text-sm rounded ${mapType === 'k' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Satélite</button>
-            <button onClick={() => setMapType('p')} className={`px-3 py-1 text-sm rounded ${mapType === 'p' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Relevo</button>
+          
+          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 flex gap-2 shadow-md">
+            <button onClick={() => {setMapType('m'); if(!routeActive) setMapSrc(LOCATION_COORDS.m)}} className={`px-3 py-1 text-sm rounded ${mapType === 'm' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Padrão</button>
+            <button onClick={() => {setMapType('k'); if(!routeActive) setMapSrc(LOCATION_COORDS.k)}} className={`px-3 py-1 text-sm rounded ${mapType === 'k' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Satélite</button>
+            <button onClick={() => {setMapType('p'); if(!routeActive) setMapSrc(LOCATION_COORDS.p)}} className={`px-3 py-1 text-sm rounded ${mapType === 'p' ? 'bg-[#0A43D8] text-white' : 'hover:bg-gray-100'}`}>Relevo</button>
           </div>
         </div>
       </div>

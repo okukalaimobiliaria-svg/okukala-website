@@ -22,6 +22,8 @@ interface InvestmentItem {
 
 type TabType = 'fale' | 'trabalhe' | 'investidor'
 
+const selectClass = "w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#03113E] placeholder:text-gray-400 focus:border-[#0A43D8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A43D8]/20 transition-all"
+
 export default function ContatoPage() {
   const [activeTab, setActiveTab] = useState<TabType>('fale')
   const [activeJobIndex, setActiveJobIndex] = useState(0)
@@ -152,10 +154,6 @@ export default function ContatoPage() {
       setTrabalheSuccess(true)
       setTrabalheForm({ nome: '', email: '', telefone: '', cargo: jobs[activeJobIndex]?.title || trabalheForm.cargo, mensagem: '' })
       form.reset()
-      const curriculoInput = form.querySelector('input[name="curriculo"]')
-      if (curriculoInput instanceof HTMLInputElement) {
-        curriculoInput.value = ''
-      }
       setTimeout(() => setTrabalheSuccess(false), 4000)
     } catch (err) {
       setTrabalheError('Erro ao enviar candidatura. Tente novamente.')
@@ -443,7 +441,7 @@ export default function ContatoPage() {
                         name="cargo"
                         value={trabalheForm.cargo}
                         onChange={handleTrabalheChange}
-                        className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none"
+                        className={selectClass}
                       >
                         {jobs.map((job) => <option key={job.title} value={job.title}>{job.title}</option>)}
                       </select>
@@ -452,16 +450,6 @@ export default function ContatoPage() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-600 mb-1.5">Mensagem</label>
                     <textarea name="mensagem" value={trabalheForm.mensagem} onChange={handleTrabalheChange} rows={4} required className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none resize-none" placeholder="Conte-nos um pouco sobre você..." />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-600 mb-1.5">Currículo</label>
-                    <input
-                      type="file"
-                      name="curriculo"
-                      accept=".pdf,.doc,.docx"
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 file:mr-4 file:rounded-full file:border-0 file:bg-[#0A43D8] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#042A8F]"
-                    />
-                    <p className="mt-2 text-xs text-gray-500">Anexe o seu currículo em PDF, DOC ou DOCX.</p>
                   </div>
                   {trabalheError && (
                     <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-600">
@@ -555,7 +543,7 @@ export default function ContatoPage() {
                         name="tipoInvestimento"
                         value={investidorForm.tipoInvestimento}
                         onChange={handleInvestorChange}
-                        className="w-full appearance-none rounded-xl border border-gray-200 px-4 py-3 text-sm bg-white focus:border-[#0A43D8] focus:ring-2 focus:ring-[#0A43D8]/20 outline-none"
+                        className={selectClass}
                       >
                         {investments.map((opt) => <option key={opt.title} value={opt.title}>{opt.title}</option>)}
                       </select>

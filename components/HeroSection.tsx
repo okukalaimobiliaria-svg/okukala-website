@@ -274,8 +274,8 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
         {/* A. LINHA SUPERIOR — Métricas */}
         <div className="grid grid-cols-3 gap-4 lg:flex lg:items-start lg:gap-12">
           {[
-            { val: '150+', label: 'Imóveis Listados' },
-            { val: '10+', label: 'Anos de Experiência' },
+            { val: '18+', label: 'Imóveis Listados' },
+            { val: '2+', label: 'Anos de Experiência' },
             { val: '98%', label: 'Clientes Satisfeitos' },
           ].map((item, i) => (
             <div key={i}>

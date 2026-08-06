@@ -38,9 +38,9 @@ interface BlogRelatedItem {
   categoria?: string | null
 }
 
-async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | null> {
+async function getBlogPostBySlug(slugOrId: string): Promise<BlogPostDetail | null> {
   try {
-    const data = await hygraphClient.request<{ blogs: BlogPostDetail[] }>(GET_BLOG_BY_SLUG, { slug })
+    const data = await hygraphClient.request<{ blogs: BlogPostDetail[] }>(GET_BLOG_BY_SLUG, { slug: slugOrId, id: slugOrId })
     return data.blogs?.[0] || null
   } catch (error) {
     console.error('Erro ao carregar artigo do blog:', error)
@@ -48,9 +48,9 @@ async function getBlogPostBySlug(slug: string): Promise<BlogPostDetail | null> {
   }
 }
 
-async function getRelatedBlogs(slug: string): Promise<BlogRelatedItem[]> {
+async function getRelatedBlogs(excludeId: string): Promise<BlogRelatedItem[]> {
   try {
-    const data = await hygraphClient.request<{ blogs: BlogRelatedItem[] }>(GET_RELATED_BLOGS, { slug, first: 3 })
+    const data = await hygraphClient.request<{ blogs: BlogRelatedItem[] }>(GET_RELATED_BLOGS, { excludeId, first: 3 })
     return data.blogs || []
   } catch (error) {
     console.error('Erro ao carregar artigos relacionados:', error)
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params
   const post = await getBlogPostBySlug(slug)
-  const relatedPosts = post ? await getRelatedBlogs(slug) : []
+  const relatedPosts = post ? await getRelatedBlogs(post.id) : []
 
   if (!post) {
     notFound()
@@ -98,7 +98,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               {relatedPosts.map((relatedPost) => (
                 <Link
                   key={relatedPost.id}
-                  href={`/blog/${relatedPost.slug}`}
+                  href={`/blog/${relatedPost.slug ?? relatedPost.id}`}
                   className="group overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-lg shadow-blue-900/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/10"
                 >
                   <div className="relative h-56 w-full overflow-hidden bg-gray-100">

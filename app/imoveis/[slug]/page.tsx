@@ -29,6 +29,7 @@ interface ImovelDetail {
   quantidadeDeQuartos?: number | null
   vagasNaGaragem?: number | null
   area?: number | null
+  imagemDeDestaque?: { url?: string | null } | null
   imagens?: Array<{ url?: string | null }> | { url?: string | null } | null
   estadoDoImovel: string
   caracteristicasPrincipais?: string[] | null
@@ -131,7 +132,10 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     console.error('Erro ao carregar imóveis relacionados:', error)
   }
 
-  const mapEmbedUrl = getMapEmbedUrl(property.linkDoMapa)
+  const mapEmbedUrl = getMapEmbedUrl(property.linkDoMapa) ?? (() => {
+    const fallbackQuery = [property.bairro, property.cidade].filter(Boolean).join(', ').trim()
+    return fallbackQuery ? `https://www.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&output=embed` : null
+  })()
 
   return (
     <main className="w-full bg-[#F8FAFC]">
@@ -188,7 +192,10 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
             {/* Gallery - extends to left edge */}
             <div className="lg:-ml-[max(0px,calc((100vw-1400px)/2))] lg:pl-[max(0px,calc((100vw-1400px)/2))] space-y-8">
               <ImageGallery
-                imagens={getImagensArray(property.imagens)}
+                imagens={getImagensArray([
+                  property.imagemDeDestaque,
+                  ...(Array.isArray(property.imagens) ? property.imagens : property.imagens ? [property.imagens] : []),
+                ])}
                 titulo={property.nomeDoImovel}
               />
 
@@ -362,7 +369,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   </p>
                   <div className="flex flex-col gap-2.5">
                     <a
-                      href="https://wa.me/244912345678"
+                      href="https://wa.me/244932263593"
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center justify-center gap-2 rounded-xl bg-[#22c55e] px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[#16a34a]"

@@ -9,6 +9,9 @@ export const GET_HOME_IMOVEIS = `
       quantidadeDeQuartos
       vagasNaGaragem
       area
+      imagemDeDestaque {
+        url
+      }
       imagens {
         url
       }
@@ -68,6 +71,9 @@ export const GET_IMOVEL_BY_SLUG = `
       quantidadeDeQuartos
       vagasNaGaragem
       area
+      imagemDeDestaque {
+        url
+      }
       imagens {
         url
       }
@@ -100,8 +106,8 @@ export const GET_RELATED_IMOVEIS = `
 `
 
 export const GET_RELATED_BLOGS = `
-  query GetRelatedBlogs($slug: String!, $first: Int!) {
-    blogs(where: { slug_not: $slug }, first: $first, orderBy: dataDePublicacao_DESC) {
+  query GetRelatedBlogs($excludeId: ID!, $first: Int!) {
+    blogs(where: { id_not: $excludeId }, first: $first, orderBy: dataDePublicacao_DESC) {
       id
       titulo
       slug
@@ -115,7 +121,7 @@ export const GET_RELATED_BLOGS = `
 
 export const GET_BLOGS = `
   query GetBlogs {
-    blogs(orderBy: dataDePublicacao_DESC, first: 20) {
+    blogs(orderBy: dataDePublicacao_DESC, first: 1000) {
       id
       titulo
       slug
@@ -151,8 +157,8 @@ export const GET_FEATURED_BLOGS = `
 `
 
 export const GET_BLOG_BY_SLUG = `
-  query GetBlogBySlug($slug: String!) {
-    blogs(where: { slug: $slug }, first: 1) {
+  query GetBlogBySlug($slug: String, $id: ID) {
+    blogs(where: { OR: [{ slug: $slug }, { id: $id }] }, first: 1) {
       id
       titulo
       slug

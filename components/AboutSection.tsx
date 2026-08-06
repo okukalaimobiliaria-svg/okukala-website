@@ -24,7 +24,7 @@ export function AboutSection() {
                 <Building2 className="w-6 h-6 md:w-7 md:h-7" />
               </span>
               <div>
-                <p className="font-montserrat font-extrabold text-[#021a5c] text-xl md:text-2xl">10+ Anos</p>
+                <p className="font-montserrat font-extrabold text-[#021a5c] text-xl md:text-2xl">2+ Anos</p>
                 <p className="text-xs md:text-sm text-gray-500 font-medium">De Experiência em Angola</p>
               </div>
             </div>
