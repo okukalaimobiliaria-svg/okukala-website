@@ -3,7 +3,7 @@
 import Image from 'next/image'
 
 export function WhatsAppButton() {
-  const whatsappNumber = '244923934470'
+  const whatsappNumber = '244932263593'
   const message = 'Olá! Gostaria de mais informações sobre os serviços da OKUKALA.'
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
 

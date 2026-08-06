@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Calendar, Clock, X, CalendarCheck } from 'lucide-react'
 import { sendAppointmentRequest } from '@/lib/emailjs'
 
@@ -26,6 +27,12 @@ export function AppointmentForm({ isOpen, onClose, propertyTitle, slug }: Appoin
     hora: '',
     mensagem: '',
   })
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -66,9 +73,9 @@ export function AppointmentForm({ isOpen, onClose, propertyTitle, slug }: Appoin
     }
   }
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
+  return createPortal(
     <>
       <div
         className="fixed inset-0 z-[999] bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300"
@@ -161,6 +168,7 @@ export function AppointmentForm({ isOpen, onClose, propertyTitle, slug }: Appoin
           </form>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }

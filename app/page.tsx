@@ -73,7 +73,7 @@ export default function Page() {
           date: b.dataDePublicacao ? new Date(b.dataDePublicacao).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' }) : '',
           title: b.titulo,
           excerpt: b.resumo,
-          slug: `/blog/${b.slug}`,
+          slug: `/blog/${b.slug ?? b.id}`,
         }))
         setFeaturedBlogs(mapped.length ? mapped : fallbackNews)
       } catch (e) {
@@ -109,16 +109,17 @@ export default function Page() {
             quantidadeDeQuartos?: number | null
             vagasNaGaragem?: number | null
             area?: number | null
-            imagens?: { url?: string | null } | null
+            imagemDeDestaque?: { url?: string | null } | null
+            imagens?: Array<{ url?: string | null }> | null
             tipoDeOferta: string
           }>
         }>(GET_HOME_IMOVEIS)
 
         if (!isMounted) return
 
-        const mappedProperties = (data.imoveiss || []).map((property, index) => ({
+        const mappedProperties = (data.imoveiss || []).map((property) => ({
           id: property.id,
-          image: property.imagens?.url || `/Imagens/imovel${(index % 5) + 1}.png`,
+          image: property.imagemDeDestaque?.url || `/Imagens/imovel-default.png`,
           tag: property.tipoDeOferta === 'aluguel' ? 'Aluguel' : 'Venda',
           title: property.nomeDoImovel,
           location: property.cidade,

@@ -116,7 +116,7 @@ export function ContactForm() {
             value={formData.assunto}
             onChange={handleChange}
             required
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#03113E] focus:border-[#0A43D8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A43D8]/20 transition-all"
+            className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#03113E] focus:border-[#0A43D8] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0A43D8]/20 transition-all"
           >
             <option value="">Selecione o assunto</option>
             <option value="compra">Compra de Imóvel</option>

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { BlogList } from '@/components/BlogList'
 import { hygraphClient } from '@/lib/hygraph'
-import { GET_BLOGS } from '@/lib/queries'
+import { GET_BLOGS, GET_FEATURED_BLOGS } from '@/lib/queries'
 
 export const metadata: Metadata = {
   title: 'Blog - OKUKALA Imobiliária',
@@ -24,8 +24,23 @@ export default async function BlogPage() {
   let posts: BlogPostListItem[] = []
 
   try {
-    const data = await hygraphClient.request<{ blogs: BlogPostListItem[] }>(GET_BLOGS)
-    posts = (data.blogs || []).filter((post) => Boolean(post.slug))
+    const [blogData, featuredData] = await Promise.all([
+      hygraphClient.request<{ blogs: BlogPostListItem[] }>(GET_BLOGS),
+      hygraphClient.request<{ blogs: BlogPostListItem[] }>(GET_FEATURED_BLOGS),
+    ])
+
+    const latestPosts = (blogData.blogs || []).map((post) => ({ ...post, slug: post.slug ?? post.id }))
+    const featuredPosts = (featuredData.blogs || []).map((post) => ({ ...post, slug: post.slug ?? post.id }))
+
+    const combinedPosts = [...featuredPosts, ...latestPosts]
+    const uniquePostsMap = new Map<string, BlogPostListItem>()
+
+    combinedPosts.forEach((post) => {
+      const key = post.slug || post.id
+      uniquePostsMap.set(key, { ...post, slug: post.slug ?? post.id })
+    })
+
+    posts = Array.from(uniquePostsMap.values())
   } catch (error) {
     console.error('Erro ao carregar posts do blog:', error)
   }
