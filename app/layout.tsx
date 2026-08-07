@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt" className={`${montserrat.variable} ${poppins.variable} ${roboto.variable}`}>
-      <body className="font-sans antialiased bg-white flex min-h-screen flex-col">
+      <body suppressHydrationWarning className="font-sans antialiased bg-white flex min-h-screen flex-col">
         <TopBar />
         <Header />
         <MotionProvider>

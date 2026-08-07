@@ -18,6 +18,7 @@ export interface FeaturedProperty {
   baths: number
   area: number
   slug: string
+  highlight?: boolean
 }
 
 export const services = [

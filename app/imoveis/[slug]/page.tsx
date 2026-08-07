@@ -112,7 +112,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
   let relatedProperties: ImovelListItem[] = []
 
   try {
-    const data = await hygraphClient.request<{ imoveiss: ImovelDetail[] }>(GET_IMOVEL_BY_SLUG, { slug })
+    const data = await hygraphClient.request<{ imoveiss: ImovelDetail[] }>(GET_IMOVEL_BY_SLUG, { slug, id: slug })
     property = data.imoveiss?.[0] || null
   } catch (error) {
     console.error('Erro ao carregar imóvel:', error)
@@ -124,7 +124,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   try {
     const relatedData = await hygraphClient.request<{ imoveiss: ImovelListItem[] }>(GET_RELATED_IMOVEIS, {
-      slug: property.slug,
+      excludeId: property.id,
       first: 3,
     })
     relatedProperties = relatedData.imoveiss || []
