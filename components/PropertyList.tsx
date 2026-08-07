@@ -15,6 +15,7 @@ interface ImovelItem {
   quantidadeDeQuartos?: number | null
   vagasNaGaragem?: number | null
   area?: number | null
+  imagemDeDestaque?: { url?: string | null } | null
   imagens: { url: string } | null
   tipoDeOferta: string
 }
@@ -142,14 +143,15 @@ export function PropertyList({ properties }: PropertyListProps) {
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 {paginated.map((property) => (
                 <PropertyCard
-                  key={property.slug}
+                  key={property.slug ?? property.id}
                   titulo={property.nomeDoImovel}
                   preco={property.preco}
-                  slug={property.slug}
+                  slug={property.slug ?? property.id}
                   imagem={
-                    Array.isArray(property.imagens)
+                    property.imagemDeDestaque?.url ||
+                    (Array.isArray(property.imagens)
                       ? (property.imagens as any)[0]?.url
-                      : (property.imagens as any)?.url || ''
+                      : (property.imagens as any)?.url) || ''
                   }
                   tipo={property.tipoDeOferta === 'venda' ? 'Venda' : 'Aluguel'}
                   cidade={property.cidade}

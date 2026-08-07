@@ -37,9 +37,11 @@ export const GET_ALL_IMOVEIS = `
       quantidadeDeQuartos
       vagasNaGaragem
       area
+      imagemDeDestaque { url }
       imagens {
         url
       }
+      destacarNaPaginaInicial
       tipoDeOferta
     }
     imoveissConnection(
@@ -55,8 +57,8 @@ export const GET_ALL_IMOVEIS = `
 `
 
 export const GET_IMOVEL_BY_SLUG = `
-  query GetImovelBySlug($slug: String!) {
-    imoveiss(where: { slug: $slug }, first: 1) {
+  query GetImovelBySlug($slug: String, $id: ID) {
+    imoveiss(where: { OR: [{ slug: $slug }, { id: $id }] }, first: 1) {
       id
       nomeDoImovel
       slug
@@ -87,8 +89,8 @@ export const GET_IMOVEL_BY_SLUG = `
 `
 
 export const GET_RELATED_IMOVEIS = `
-  query GetRelatedImoveis($slug: String!, $first: Int!) {
-    imoveiss(where: { slug_not: $slug, estadoDoImovel: novo }, first: $first, orderBy: createdAt_DESC) {
+  query GetRelatedImoveis($excludeId: ID!, $first: Int!) {
+    imoveiss(where: { id_not: $excludeId, estadoDoImovel: novo }, first: $first, orderBy: createdAt_DESC) {
       id
       nomeDoImovel
       slug

@@ -30,7 +30,7 @@ import { HeroSection } from '@/components/HeroSection'
 import { AboutSection } from '@/components/AboutSection'
 import { buttonVariants } from '@/components/ui/button'
 import { hygraphClient } from '@/lib/hygraph'
-import { GET_HOME_IMOVEIS, GET_FEATURED_BLOGS } from '@/lib/queries'
+import { GET_ALL_IMOVEIS, GET_FEATURED_BLOGS } from '@/lib/queries'
 import { formatPrice } from '@/lib/formatting'
 import {
   categories,
@@ -103,7 +103,7 @@ export default function Page() {
           imoveiss: Array<{
             id: string
             nomeDoImovel: string
-            slug: string
+            slug: string | null
             preco: number
             cidade: string
             quantidadeDeQuartos?: number | null
@@ -112,14 +112,15 @@ export default function Page() {
             imagemDeDestaque?: { url?: string | null } | null
             imagens?: Array<{ url?: string | null }> | null
             tipoDeOferta: string
+            destacarNaPaginaInicial?: boolean | null
           }>
-        }>(GET_HOME_IMOVEIS)
+        }>(GET_ALL_IMOVEIS, { skip: 0, first: 1000 })
 
         if (!isMounted) return
 
-        const mappedProperties = (data.imoveiss || []).map((property) => ({
+        const mappedProperties = (data.imoveiss || []).map((property, index) => ({
           id: property.id,
-          image: property.imagemDeDestaque?.url || `/Imagens/imovel-default.png`,
+          image: property.imagemDeDestaque?.url || property.imagens?.[0]?.url || `/Imagens/imovel-default.png`,
           tag: property.tipoDeOferta === 'aluguel' ? 'Aluguel' : 'Venda',
           title: property.nomeDoImovel,
           location: property.cidade,
@@ -127,7 +128,8 @@ export default function Page() {
           beds: property.quantidadeDeQuartos ?? 0,
           baths: property.vagasNaGaragem ?? 0,
           area: property.area ?? 0,
-          slug: property.slug,
+          slug: property.slug ?? property.id,
+          highlight: property.destacarNaPaginaInicial ?? false,
         }))
 
         setFeaturedProperties(mappedProperties.length > 0 ? mappedProperties : fallbackFeaturedProperties)
@@ -197,7 +199,7 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-            {filteredFeatured.map((p) => (
+            {featuredProperties.filter((p) => p.highlight).slice(0, 3).map((p) => (
               <Link
                 key={p.id}
                 href={`/imoveis/${p.slug}`}

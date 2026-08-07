@@ -29,9 +29,9 @@ export function PropertyCard({
   const imagemUrl = imagem || '/placeholder.jpg'
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg shadow-gray-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-200/50">
+    <div className="group flex flex-col h-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg shadow-gray-100/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-200/50">
       {/* Image Container */}
-      <div className="relative h-52 w-full overflow-hidden bg-gray-100">
+      <div className="relative h-52 w-full flex-shrink-0 overflow-hidden bg-gray-100">
         <Image
           src={imagemUrl}
           alt={titulo}
@@ -47,7 +47,7 @@ export function PropertyCard({
       </div>
 
       {/* Content */}
-      <div className="p-5">
+      <div className="flex flex-grow flex-col p-5">
         <h3 className="mb-3 line-clamp-2 text-lg font-bold text-[#03113E] transition-colors group-hover:text-[#0A43D8]">
           {titulo}
         </h3>
@@ -62,7 +62,7 @@ export function PropertyCard({
         </div>
 
         {/* Features */}
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+        <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-4">
           {quartos !== undefined && (
             <div className="flex items-center gap-1.5 text-xs text-gray-600">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">

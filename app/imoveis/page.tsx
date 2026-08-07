@@ -18,6 +18,7 @@ interface ImovelListItem {
   quantidadeDeQuartos?: number | null
   vagasNaGaragem?: number | null
   area?: number | null
+  imagemDeDestaque?: { url?: string | null } | null
   imagens: { url: string } | null
   tipoDeOferta: string
 }
