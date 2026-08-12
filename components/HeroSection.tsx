@@ -11,6 +11,7 @@ import {
   Bath,
   Square,
 } from 'lucide-react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 /* ──────────────────────────────────────────────────────────────────── */
@@ -146,16 +147,23 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
       {/* ════════════════════════════════════════════════════════════ */}
       <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.img
+          <motion.div
             key={currentIndex}
-            src={currentProperty.image}
-            alt={currentProperty.title}
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1.02 }}
             exit={{ opacity: 0, scale: 1 }}
             transition={{ opacity: { duration: 0.8 }, scale: { duration: 1.4, ease: 'easeOut' } }}
             className="absolute inset-0 w-full h-full object-cover z-0"
-          />
+          >
+            <Image
+              src={currentProperty.image}
+              alt={currentProperty.title}
+              fill
+              sizes="100vw"
+              priority={true}
+              style={{ objectFit: 'cover' }}
+            />
+          </motion.div>
         </AnimatePresence>
 
         {/* Gradiente de leitura */}
@@ -342,10 +350,13 @@ export function HeroSection({ properties = FEATURED_PROPERTIES }: HeroSectionPro
                     : 'relative z-10 w-16 h-12 lg:w-20 lg:h-14 rounded-lg overflow-hidden opacity-50 hover:opacity-80 scale-90 transition-all duration-300 cursor-pointer border border-white/15'
                 }
               >
-                <img
+                <Image
                   src={property.image}
                   alt={property.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="80px"
+                  style={{ objectFit: 'cover' }}
+                  priority={false}
                 />
                 {/* Overlay subtil nas laterais */}
                 {!isActive && (

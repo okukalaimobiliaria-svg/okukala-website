@@ -3,6 +3,9 @@ import { BlogList } from '@/components/BlogList'
 import { hygraphClient } from '@/lib/hygraph'
 import { GET_BLOGS, GET_FEATURED_BLOGS } from '@/lib/queries'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Blog - OKUKALA Imobiliária',
   description: 'Artigos e dicas sobre o mercado imobiliário em Angola. Conheça tendências, guias de investimento e muito mais.',

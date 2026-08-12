@@ -2,6 +2,9 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { hygraphClient } from '@/lib/hygraph'
 import { GET_BLOG_BY_SLUG, GET_RELATED_BLOGS } from '@/lib/queries'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { BlogPostContent } from './BlogPostContent'
 import Link from 'next/link'
 import Image from 'next/image'
