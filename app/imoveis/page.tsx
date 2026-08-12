@@ -4,6 +4,9 @@ import { hygraphClient } from '@/lib/hygraph'
 import { GET_ALL_IMOVEIS } from '@/lib/queries'
 import { Building2, TrendingUp, Home, ShieldCheck } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'Imóveis à Venda e Aluguel - OKUKALA',
   description: 'Explore nosso catálogo completo de imóveis em Angola. Apartamentos, casas, terrenos e imóveis comerciais.',
@@ -29,7 +32,7 @@ export default async function ImoveisPage() {
   try {
     const data = await hygraphClient.request<{ imoveiss: ImovelListItem[] }>(GET_ALL_IMOVEIS, {
       skip: 0,
-      first: 100,
+      first: 1000,
     })
     allProperties = data.imoveiss || []
   } catch (error) {

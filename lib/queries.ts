@@ -24,9 +24,6 @@ export const GET_ALL_IMOVEIS = `
     imoveiss(
       skip: $skip
       first: $first
-      where: {
-        estadoDoImovel: novo
-      }
       orderBy: createdAt_DESC
     ) {
       id
@@ -44,11 +41,7 @@ export const GET_ALL_IMOVEIS = `
       destacarNaPaginaInicial
       tipoDeOferta
     }
-    imoveissConnection(
-      where: {
-        estadoDoImovel: novo
-      }
-    ) {
+    imoveissConnection {
       aggregate {
         count
       }
