@@ -118,8 +118,21 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
     console.error('Erro ao carregar imóvel:', error)
   }
 
+  if (!property && slug) {
+    try {
+      const fallbackData = await hygraphClient.request<{ imoveiss: ImovelDetail[] }>(GET_IMOVEL_BY_SLUG, { slug: '', id: slug })
+      property = fallbackData.imoveiss?.[0] || null
+    } catch (error) {
+      console.error('Erro ao carregar imóvel por fallback:', error)
+    }
+  }
+
   if (!property) {
     notFound()
+  }
+
+  if (!property.slug) {
+    property = { ...property, slug: property.id }
   }
 
   try {

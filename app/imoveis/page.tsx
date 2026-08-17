@@ -26,15 +26,37 @@ interface ImovelListItem {
   tipoDeOferta: string
 }
 
+function normalizeImovelListItem(item: Partial<ImovelListItem> & { slug?: string | null; nomeDoImovel?: string | null; tipoDeOferta?: string | null; cidade?: string | null; preco?: number | string | null }): ImovelListItem {
+  const safeSlug = item.slug && item.slug.trim() ? item.slug : item.id || 'sem-slug'
+  const safeName = item.nomeDoImovel && item.nomeDoImovel.trim() ? item.nomeDoImovel : 'Imóvel sem nome'
+
+  return {
+    id: item.id || safeSlug,
+    nomeDoImovel: safeName,
+    slug: safeSlug,
+    preco: Number(item.preco ?? 0),
+    cidade: item.cidade && item.cidade.trim() ? item.cidade : 'Luanda',
+    quantidadeDeQuartos: item.quantidadeDeQuartos ?? null,
+    vagasNaGaragem: item.vagasNaGaragem ?? null,
+    area: item.area ?? null,
+    imagemDeDestaque: item.imagemDeDestaque ?? null,
+    imagens: item.imagens ?? null,
+    tipoDeOferta: item.tipoDeOferta && item.tipoDeOferta.trim() ? item.tipoDeOferta : 'venda',
+  }
+}
+
 export default async function ImoveisPage() {
   let allProperties: ImovelListItem[] = []
 
   try {
-    const data = await hygraphClient.request<{ imoveiss: ImovelListItem[] }>(GET_ALL_IMOVEIS, {
+    const data = await hygraphClient.request<{ imoveiss: Partial<ImovelListItem>[] }>(GET_ALL_IMOVEIS, {
       skip: 0,
       first: 1000,
     })
-    allProperties = data.imoveiss || []
+
+    allProperties = (data.imoveiss || [])
+      .map((item) => normalizeImovelListItem(item))
+      .filter((item) => !!item.nomeDoImovel)
   } catch (error) {
     console.error('Erro ao carregar imóveis do Hygraph:', error)
   }
